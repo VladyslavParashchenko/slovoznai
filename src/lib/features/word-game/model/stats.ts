@@ -1,4 +1,4 @@
-import type { GameStats } from "./types";
+import type { GameStats } from "./types"
 
 export function createEmptyStats(attemptLimit: number): GameStats {
   return {
@@ -9,7 +9,7 @@ export function createEmptyStats(attemptLimit: number): GameStats {
     distribution: Array(attemptLimit).fill(0),
     lastPlayedDay: null,
     lastWonDay: null,
-  };
+  }
 }
 
 export function recordResult(
@@ -17,16 +17,16 @@ export function recordResult(
   day: number,
   attempts: number | null,
 ): GameStats {
-  if (stats.lastPlayedDay === day) return stats;
+  if (stats.lastPlayedDay === day) return stats
 
-  const won = attempts !== null;
+  const won = attempts !== null
   const currentStreak = won
     ? stats.lastWonDay === day - 1
       ? stats.currentStreak + 1
       : 1
-    : 0;
-  const distribution = [...stats.distribution];
-  if (won) distribution[attempts - 1] = (distribution[attempts - 1] ?? 0) + 1;
+    : 0
+  const distribution = [...stats.distribution]
+  if (won) distribution[attempts - 1] = (distribution[attempts - 1] ?? 0) + 1
 
   return {
     played: stats.played + 1,
@@ -36,12 +36,12 @@ export function recordResult(
     distribution,
     lastPlayedDay: day,
     lastWonDay: won ? day : stats.lastWonDay,
-  };
+  }
 }
 
 /** Серія обривається, якщо вчорашнє слово не відгадане. */
 export function getActiveStreak(stats: GameStats, today: number) {
   return stats.lastWonDay !== null && stats.lastWonDay >= today - 1
     ? stats.currentStreak
-    : 0;
+    : 0
 }

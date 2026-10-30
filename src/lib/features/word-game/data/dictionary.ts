@@ -1,4 +1,4 @@
-import { ACCEPTED_WORDS_SOURCE } from "./accepted-words";
+import { ACCEPTED_WORDS_SOURCE } from "./accepted-words"
 
 /** Загадані слова в порядку появи: слово дня №1, №2, … Нові слова додавайте в кінець. */
 export const ANSWER_WORDS = [
@@ -394,19 +394,19 @@ export const ANSWER_WORDS = [
   "зерно",
   "осінь",
   "режим",
-] as const;
+] as const
 
 /** Словник прийнятних спроб: усі 5-літерні леми плюс загадані слова. */
 export const ACCEPTED_WORDS: ReadonlySet<string> = new Set([
   ...ACCEPTED_WORDS_SOURCE.split(/\s+/).filter(Boolean),
   ...ANSWER_WORDS,
-]);
+])
 
 export const KEYBOARD_ROWS = [
   ["й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ї"],
   ["ф", "і", "в", "а", "п", "р", "о", "л", "д", "ж", "є"],
   ["я", "ч", "с", "м", "и", "т", "ь", "б", "ю", "ґ"],
-] as const;
+] as const
 
 /** Фізичні клавіші стандартної української розкладки — щоб грати й з латинською розкладкою. */
 export const PHYSICAL_KEY_MAP: Record<string, string> = {
@@ -443,4 +443,4 @@ export const PHYSICAL_KEY_MAP: Record<string, string> = {
   KeyM: "ь",
   Comma: "б",
   Period: "ю",
-};
+}
