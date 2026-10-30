@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #242424;
+  --color-paper: #f2f2f2;
+  --color-accent: #f36b00;
+  --font-display: "Playfair Display", serif;
+  --font-sans: "Manrope", sans-serif;
+}
+
+:root {
+  color-scheme: light;
+  --color-ink: #242424;
+  --color-paper: #f2f2f2;
+  --color-surface: #ffffff;
+  --color-surface-muted: #e1e1e1;
+  --color-border: #c9c9c9;
+  --color-muted: #626262;
+  --color-accent: #f36b00;
+  --color-accent-strong: #c95700;
+  --color-accent-soft: #ffe1cc;
+  --color-accent-contrast: #2b1a0a;
+  --color-correct: #f36b00;
+  --color-present: #b0b0b0;
+  --color-present-contrast: #242424;
+  --color-absent: #777777;
+}
+
+/* Тему виставляє скрипт у app.html (система або збережений вибір). */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-ink: #f5f5f5;
+  --color-paper: #252525;
+  --color-surface: #333333;
+  --color-surface-muted: #434343;
+  --color-border: #5c5c5c;
+  --color-muted: #cecece;
+  --color-accent: #ff7800;
+  --color-accent-strong: #ffb066;
+  --color-accent-soft: #572f14;
+  --color-accent-contrast: #21150b;
+  --color-correct: #ff7800;
+  --color-present: #aaaaaa;
+  --color-present-contrast: #242424;
+  --color-absent: #7a7a7a;
+}
+
+* {
+  box-sizing: border-box;
+}
+html {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+body {
+  min-width: 320px;
+  margin: 0;
+  font-family: var(--font-sans);
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}

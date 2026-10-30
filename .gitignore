@@ -1,0 +1,22 @@
+# Залежності та артефакти збірки
+node_modules/
+.svelte-kit/
+build/
+
+# Оточення
+.env
+.env.*
+!.env.example
+
+# Логи та кеші
+*.log
+npm-debug.log*
+.eslintcache
+vite.config.*.timestamp-*
+
+# Редактори та ОС
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
