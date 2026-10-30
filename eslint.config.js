@@ -1,8 +1,9 @@
-import js from "@eslint/js";
-import eslintConfigPrettier from "eslint-config-prettier";
-import svelte from "eslint-plugin-svelte";
-import globals from "globals";
-import tseslint from "typescript-eslint";
+import js from "@eslint/js"
+import stylistic from "@stylistic/eslint-plugin"
+import eslintConfigPrettier from "eslint-config-prettier"
+import svelte from "eslint-plugin-svelte"
+import globals from "globals"
+import tseslint from "typescript-eslint"
 
 export default tseslint.config(
   { ignores: ["build/**", ".svelte-kit/**", "node_modules/**"] },
@@ -16,4 +17,9 @@ export default tseslint.config(
   },
   eslintConfigPrettier,
   ...svelte.configs["flat/prettier"],
-);
+  // Після eslint-config-prettier, бо він вимикає стильові правила.
+  {
+    plugins: { "@stylistic": stylistic },
+    rules: { "@stylistic/semi": ["error", "never"] },
+  },
+)

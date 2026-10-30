@@ -1,0 +1,44 @@
+# Git-хуки через prek (https://prek.j178.dev). Встановлюються автоматично після `npm install`.
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+
+repos:
+  - repo: builtin
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: [--maxkb=1500]
+      - id: detect-private-key
+
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier
+        entry: npx --no-install prettier --check --ignore-unknown
+        language: system
+        types: [text]
+
+      - id: eslint
+        name: eslint
+        entry: npx --no-install eslint --max-warnings=0 --no-warn-ignored
+        language: system
+        files: \.(js|ts|svelte)$
+
+      - id: svelte-check
+        name: svelte-check
+        entry: npm run check
+        language: system
+        files: \.(ts|svelte)$
+        pass_filenames: false
+
+      - id: commitlint
+        name: commitlint
+        entry: npx --no-install commitlint --edit
+        language: system
+        stages: [commit-msg]

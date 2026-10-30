@@ -10,10 +10,16 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "prepare": "prek install",
+    "hooks": "prek run --all-files"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@eslint/js": "^10.0.1",
+    "@j178/prek": "^0.5.8",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@sveltejs/adapter-static": "^3.0.10",
     "@sveltejs/kit": "^2.70.3",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
@@ -31,6 +37,6 @@
     "vite": "^8.0.16"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   }
 }
