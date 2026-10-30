@@ -6,7 +6,6 @@ const THEME_COLORS: Record<Theme, string> = {
   dark: "#252525",
 }
 
-/** Поточна тема, яку вже виставив скрипт у app.html. */
 export function getTheme(): Theme {
   return document.documentElement.dataset.theme === "dark" ? "dark" : "light"
 }

@@ -25,7 +25,6 @@ export function buildShareText(
   return `Словознай №${day + 1} ${score}/${attemptLimit}\n\n${grid}`
 }
 
-/** Системне меню «Поділитися» на телефонах, інакше — копіювання. Повертає підпис для кнопки. */
 export async function shareResult(text: string): Promise<string | null> {
   try {
     if (navigator.share && window.matchMedia("(pointer: coarse)").matches) {

@@ -17,7 +17,6 @@ export default tseslint.config(
   },
   eslintConfigPrettier,
   ...svelte.configs["flat/prettier"],
-  // Після eslint-config-prettier, бо він вимикає стильові правила.
   {
     plugins: { "@stylistic": stylistic },
     rules: { "@stylistic/semi": ["error", "never"] },

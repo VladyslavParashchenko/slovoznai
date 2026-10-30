@@ -7,7 +7,6 @@
   let theme = $state(getTheme())
 
   $effect(() => {
-    // Поки вибір не збережено, тема слідує за системою — оновлюємо іконку.
     const colorScheme = window.matchMedia("(prefers-color-scheme: dark)")
     const syncTheme = () => (theme = getTheme())
     colorScheme.addEventListener("change", syncTheme)

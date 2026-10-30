@@ -34,7 +34,14 @@ repos:
         name: svelte-check
         entry: npm run check
         language: system
-        files: \.(ts|svelte)$
+        files: (\.(ts|svelte)|^package(-lock)?\.json)$
+        pass_filenames: false
+
+      - id: vitest
+        name: vitest
+        entry: npm test
+        language: system
+        files: (\.(ts|svelte)|^package(-lock)?\.json)$
         pass_filenames: false
 
       - id: commitlint

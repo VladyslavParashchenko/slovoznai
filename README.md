@@ -15,6 +15,7 @@ npm install
 npm run dev       # дев-сервер
 npm run check     # перевірка типів
 npm run lint      # ESLint
+npm test          # тести (Vitest), npm run test:watch — у режимі спостереження
 npm run build     # статична збірка в build/
 npm run preview   # перегляд збірки
 ```
@@ -25,7 +26,7 @@ npm run preview   # перегляд збірки
 
 Хуки керуються [prek](https://prek.j178.dev) і встановлюються автоматично під час `npm install` (скрипт `prepare`). Конфігурація — `.pre-commit-config.yaml`.
 
-- **pre-commit:** пробіли й кінці файлів, конфлікти злиття, YAML/JSON, великі файли, приватні ключі, Prettier, ESLint, svelte-check.
+- **pre-commit:** пробіли й кінці файлів, конфлікти злиття, YAML/JSON, великі файли, приватні ключі, Prettier, ESLint, svelte-check, тести.
 - **commit-msg:** [commitlint](https://commitlint.js.org) з [Conventional Commits](https://www.conventionalcommits.org/uk/): `feat: додати темну тему`, `fix(board): …`, `chore: …`. Тип і опис — з малої літери.
 
 ```sh

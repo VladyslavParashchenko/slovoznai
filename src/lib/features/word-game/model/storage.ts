@@ -4,6 +4,10 @@ import type { GameStats, SavedDailyGame } from "./types"
 const DAILY_KEY = "slovoznai:daily:v1"
 const STATS_KEY = "slovoznai:stats:v1"
 
+function isCount(value: unknown): value is number {
+  return Number.isInteger(value) && (value as number) >= 0
+}
+
 function read<T>(key: string): T | null {
   try {
     const raw = localStorage.getItem(key)
@@ -31,14 +35,29 @@ export function saveDailyGame(game: SavedDailyGame) {
 }
 
 export function loadStats(attemptLimit: number): GameStats | null {
-  const saved = read<Partial<GameStats>>(STATS_KEY)
-  if (!saved) return null
-  const stats = { ...createEmptyStats(attemptLimit), ...saved }
-  stats.distribution = Array.from(
-    { length: attemptLimit },
-    (_, index) => stats.distribution[index] ?? 0,
-  )
-  return stats
+  const saved = read<Record<string, unknown>>(STATS_KEY)
+  if (typeof saved !== "object" || saved === null) return null
+
+  const empty = createEmptyStats(attemptLimit)
+  const count = (key: "played" | "wins" | "currentStreak" | "maxStreak") =>
+    isCount(saved[key]) ? saved[key] : empty[key]
+  const day = (key: "lastPlayedDay" | "lastWonDay") =>
+    Number.isInteger(saved[key]) ? (saved[key] as number) : null
+  const distribution = Array.isArray(saved.distribution)
+    ? saved.distribution
+    : []
+
+  return {
+    played: count("played"),
+    wins: count("wins"),
+    currentStreak: count("currentStreak"),
+    maxStreak: count("maxStreak"),
+    distribution: Array.from({ length: attemptLimit }, (_, index) =>
+      isCount(distribution[index]) ? distribution[index] : 0,
+    ),
+    lastPlayedDay: day("lastPlayedDay"),
+    lastWonDay: day("lastWonDay"),
+  }
 }
 
 export function saveStats(stats: GameStats) {

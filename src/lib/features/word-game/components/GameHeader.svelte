@@ -18,10 +18,10 @@
   >
   <div class="actions">
     <ThemeToggle />
-    <IconButton label="Як грати" onclick={onHelp}>?</IconButton>
     <IconButton label="Статистика" onclick={onStats}>
       <StatsIcon />
     </IconButton>
+    <IconButton label="Як грати" onclick={onHelp}>?</IconButton>
   </div>
 </header>
 

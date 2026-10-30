@@ -1,10 +1,8 @@
 import { ANSWER_WORDS } from "../data/dictionary"
 
 const DAY_MS = 24 * 60 * 60 * 1000
-/** День, коли вийшло слово дня №1. */
 const LAUNCH_DAY = Date.UTC(2026, 9, 29)
 
-/** Номер дня за місцевим календарем гравця: 0 — день запуску. */
 export function getDayNumber(now = new Date()) {
   const localDay = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
   return Math.round((localDay - LAUNCH_DAY) / DAY_MS)

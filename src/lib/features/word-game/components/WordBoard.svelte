@@ -1,4 +1,9 @@
 <script lang="ts">
+  import {
+    SHAKE_MS,
+    TILE_FLIP_MS,
+    TILE_STAGGER_MS,
+  } from "../model/game-state.svelte"
   import type { BoardCell, LetterState } from "../model/types"
 
   let {
@@ -31,7 +36,14 @@
   }
 </script>
 
-<div class="board" role="group" aria-label="Ігрове поле">
+<div
+  class="board"
+  role="group"
+  aria-label="Ігрове поле"
+  style:--flip-ms="{TILE_FLIP_MS}ms"
+  style:--stagger-ms="{TILE_STAGGER_MS}ms"
+  style:--shake-ms="{SHAKE_MS}ms"
+>
   {#each rows as row, rowIndex (rowIndex)}
     <div
       class:active-row={rowIndex === activeRow}
@@ -119,15 +131,15 @@
     animation: none;
   }
   .tile.reveal {
-    animation: flip 0.5s ease-in-out backwards;
-    animation-delay: calc(var(--index) * 250ms);
+    animation: flip var(--flip-ms) ease-in-out backwards;
+    animation-delay: calc(var(--index) * var(--stagger-ms));
   }
   .tile.win {
     animation: bounce 0.5s ease-out;
     animation-delay: calc(var(--index) * 90ms);
   }
   .shake {
-    animation: shake 0.45s ease-in-out;
+    animation: shake var(--shake-ms) ease-in-out;
   }
 
   @keyframes pop {

@@ -10,7 +10,6 @@ export function normalizeWord(value: string) {
   return value.toLocaleLowerCase("uk-UA").replace(/[^а-щьюяґєії]/g, "")
 }
 
-/** Оцінює спробу, коректно враховуючи повтори літер. */
 export function scoreGuess(guess: string, target: string): LetterState[] {
   const states: LetterState[] = Array(target.length).fill("absent")
   const unmatchedLetters = target.split("")
@@ -65,7 +64,6 @@ export function shouldReplaceKeyState(
   )
 }
 
-/** Найкращий відомий стан кожної літери після всіх спроб. */
 export function getKeyboardStates(
   guesses: string[],
   target: string,

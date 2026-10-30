@@ -16,19 +16,17 @@ const WIN_MESSAGES = [
   "Добре!",
   "Ух, в останню мить!",
 ]
-/** Перевертання 5 плиток: затримка 250 мс між ними + 500 мс на останню. */
-const REVEAL_MS = 250 * 4 + 500
-const SHAKE_MS = 450
+export const TILE_FLIP_MS = 500
+export const TILE_STAGGER_MS = 250
+export const SHAKE_MS = 450
 const ERROR_MESSAGE_MS = 1800
 const STATS_DELAY_MS = 1600
 
 interface Options {
   reduceMotion: boolean
-  /** Слово дня відгадане або спроби скінчились — після анімації. */
   onDailyFinish: () => void
 }
 
-/** Увесь стан однієї партії: слово, спроби, анімації, повідомлення, статистика. */
 export class WordGameState {
   mode = $state<GameMode>("daily")
   day = $state(0)
@@ -44,7 +42,6 @@ export class WordGameState {
   won = $derived(this.guesses.at(-1) === this.target)
   isFinished = $derived(this.won || this.guesses.length >= ATTEMPT_LIMIT)
   isRevealing = $derived(this.revealRow !== null)
-  /** Результат показуємо лише після анімації останнього рядка. */
   showResult = $derived(this.isFinished && !this.isRevealing)
   keyboardStates = $derived(
     getKeyboardStates(
@@ -58,13 +55,14 @@ export class WordGameState {
   activeRow = $derived(this.isFinished ? null : this.guesses.length)
   streak = $derived(getActiveStreak(this.stats, this.day))
 
-  #revealMs: number
+  #reduceMotion: boolean
   #onDailyFinish: () => void
   #timers: ReturnType<typeof setTimeout>[] = []
   #messageTimer: ReturnType<typeof setTimeout> | undefined
+  #shakeFrame = 0
 
   constructor({ reduceMotion, onDailyFinish }: Options) {
-    this.#revealMs = reduceMotion ? 0 : REVEAL_MS
+    this.#reduceMotion = reduceMotion
     this.#onDailyFinish = onDailyFinish
   }
 
@@ -91,7 +89,6 @@ export class WordGameState {
     this.#reset(getRandomWord(this.target))
   }
 
-  /** Слово змінюється опівночі — підхоплюємо новий день, якщо вкладка лишалась відкритою. */
   checkNewDay() {
     if (
       this.mode === "daily" &&
@@ -115,7 +112,7 @@ export class WordGameState {
   }
 
   destroy() {
-    this.#timers.forEach(clearTimeout)
+    this.#cancelPending()
     clearTimeout(this.#messageTimer)
   }
 
@@ -155,22 +152,25 @@ export class WordGameState {
       if (this.won) this.winRow = row
       if (this.mode === "daily")
         this.#later(this.#onDailyFinish, STATS_DELAY_MS)
-    }, this.#revealMs)
+    }, this.#revealMs())
   }
 
   #reject(text: string) {
     this.#showMessage(text, ERROR_MESSAGE_MS)
+    this.#restartShake()
+  }
+
+  #restartShake() {
     this.shakeRow = null
-    // Наступний кадр — щоб анімація перезапустилась при повторній помилці.
-    requestAnimationFrame(() => {
+    cancelAnimationFrame(this.#shakeFrame)
+    this.#shakeFrame = requestAnimationFrame(() => {
       this.shakeRow = this.guesses.length
       this.#later(() => (this.shakeRow = null), SHAKE_MS)
     })
   }
 
   #reset(target: string, guesses: string[] = []) {
-    this.#timers.forEach(clearTimeout)
-    this.#timers = []
+    this.#cancelPending()
     this.target = target
     this.guesses = guesses
     this.draft = ""
@@ -192,6 +192,17 @@ export class WordGameState {
     return this.won
       ? WIN_MESSAGES[this.guesses.length - 1]
       : `Загадане слово: ${this.target.toUpperCase()}`
+  }
+
+  #revealMs() {
+    if (this.#reduceMotion) return 0
+    return TILE_STAGGER_MS * (this.target.length - 1) + TILE_FLIP_MS
+  }
+
+  #cancelPending() {
+    this.#timers.forEach(clearTimeout)
+    this.#timers = []
+    cancelAnimationFrame(this.#shakeFrame)
   }
 
   #later(callback: () => void, delay: number) {

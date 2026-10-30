@@ -39,7 +39,6 @@ export function recordResult(
   }
 }
 
-/** Серія обривається, якщо вчорашнє слово не відгадане. */
 export function getActiveStreak(stats: GameStats, today: number) {
   return stats.lastWonDay !== null && stats.lastWonDay >= today - 1
     ? stats.currentStreak

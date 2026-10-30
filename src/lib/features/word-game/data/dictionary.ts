@@ -1,6 +1,5 @@
 import { ACCEPTED_WORDS_SOURCE } from "./accepted-words"
 
-/** Загадані слова в порядку появи: слово дня №1, №2, … Нові слова додавайте в кінець. */
 export const ANSWER_WORDS = [
   "моряк",
   "честь",
@@ -396,7 +395,6 @@ export const ANSWER_WORDS = [
   "режим",
 ] as const
 
-/** Словник прийнятних спроб: усі 5-літерні леми плюс загадані слова. */
 export const ACCEPTED_WORDS: ReadonlySet<string> = new Set([
   ...ACCEPTED_WORDS_SOURCE.split(/\s+/).filter(Boolean),
   ...ANSWER_WORDS,
@@ -408,7 +406,6 @@ export const KEYBOARD_ROWS = [
   ["я", "ч", "с", "м", "и", "т", "ь", "б", "ю", "ґ"],
 ] as const
 
-/** Фізичні клавіші стандартної української розкладки — щоб грати й з латинською розкладкою. */
 export const PHYSICAL_KEY_MAP: Record<string, string> = {
   KeyQ: "й",
   KeyW: "ц",

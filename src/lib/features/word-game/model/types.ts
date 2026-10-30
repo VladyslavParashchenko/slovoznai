@@ -19,7 +19,6 @@ export interface GameStats {
   wins: number
   currentStreak: number
   maxStreak: number
-  /** Кількість перемог за номером спроби (індекс 0 — з першої спроби). */
   distribution: number[]
   lastPlayedDay: number | null
   lastWonDay: number | null
