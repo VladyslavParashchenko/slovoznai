@@ -8,7 +8,7 @@
 
 ## Розробка
 
-Потрібен Node.js 22+; у проєкті закріплено 24.18.0 (`.nvmrc`, `.tool-versions`).
+Потрібен Node.js 26+; у проєкті закріплено 26.5.1 (`.nvmrc`, `.tool-versions`).
 
 ```sh
 npm install
@@ -20,6 +20,17 @@ npm run preview   # перегляд збірки
 ```
 
 Готовий сайт — вміст `build/`; його можна викласти на будь-який статичний хостинг. Невідомі шляхи повертають `index.html` (SPA-фолбек).
+
+## Git-хуки та коміти
+
+Хуки керуються [prek](https://prek.j178.dev) і встановлюються автоматично під час `npm install` (скрипт `prepare`). Конфігурація — `.pre-commit-config.yaml`.
+
+- **pre-commit:** пробіли й кінці файлів, конфлікти злиття, YAML/JSON, великі файли, приватні ключі, Prettier, ESLint, svelte-check.
+- **commit-msg:** [commitlint](https://commitlint.js.org) з [Conventional Commits](https://www.conventionalcommits.org/uk/): `feat: додати темну тему`, `fix(board): …`, `chore: …`. Тип і опис — з малої літери.
+
+```sh
+npm run hooks     # усі хуки по всьому репозиторію
+```
 
 ## Словник
 
