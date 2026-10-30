@@ -9,30 +9,43 @@
     <meta name="theme-color" content="#f2f2f2" />
     <script>
       // До старту застосунку, щоб не було спалаху світлої теми.
-      (() => {
-        const media = matchMedia("(prefers-color-scheme: dark)");
+      ;(() => {
+        const media = matchMedia("(prefers-color-scheme: dark)")
         const apply = () => {
-          let saved = null;
+          let saved = null
           try {
-            saved = localStorage.getItem("slovoznai:theme");
+            saved = localStorage.getItem("slovoznai:theme")
           } catch {}
           const theme =
             saved === "light" || saved === "dark"
               ? saved
               : media.matches
                 ? "dark"
-                : "light";
-          document.documentElement.dataset.theme = theme;
+                : "light"
+          document.documentElement.dataset.theme = theme
           document
             .querySelector('meta[name="theme-color"]')
-            .setAttribute("content", theme === "dark" ? "#252525" : "#f2f2f2");
-        };
-        apply();
-        media.addEventListener("change", apply);
-      })();
+            .setAttribute("content", theme === "dark" ? "#252525" : "#f2f2f2")
+        }
+        apply()
+        media.addEventListener("change", apply)
+      })()
     </script>
-    <link rel="icon" href="%sveltekit.assets%/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="%sveltekit.assets%/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      href="%sveltekit.assets%/favicon.ico"
+      sizes="16x16 32x32 48x48"
+    />
+    <link
+      rel="icon"
+      href="%sveltekit.assets%/icon-192.png"
+      type="image/png"
+      sizes="192x192"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="%sveltekit.assets%/apple-touch-icon.png"
+    />
     <link rel="manifest" href="%sveltekit.assets%/manifest.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
