@@ -82,7 +82,7 @@
     border-radius: 0.35rem;
     background: var(--color-surface-muted);
     color: var(--color-ink);
-    font-size: 0.8rem;
+    font-size: 1.05rem;
     font-weight: 800;
     text-transform: uppercase;
     transition:
@@ -116,7 +116,7 @@
   }
   .key.special {
     width: 4.2rem;
-    font-size: 0.68rem;
+    font-size: 0.8rem;
   }
   .key.delete-key {
     display: inline-grid;

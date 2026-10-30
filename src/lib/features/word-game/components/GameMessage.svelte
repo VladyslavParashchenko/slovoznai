@@ -17,7 +17,7 @@
     min-height: 1.5rem;
     margin: 0 0 0.8rem;
     color: var(--color-accent-strong);
-    font-size: 0.8rem;
+    font-size: 0.95rem;
     font-weight: 700;
     opacity: 0;
     transition: opacity 0.2s;

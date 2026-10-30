@@ -77,7 +77,7 @@
   .board {
     display: grid;
     gap: 0.42rem;
-    margin: 2rem auto 1rem;
+    margin: 1.25rem auto 1rem;
   }
   .word-row {
     display: grid;
@@ -97,7 +97,7 @@
     border-radius: 0.45rem;
     background: var(--color-surface);
     color: var(--color-ink);
-    font-size: clamp(1.2rem, 5vw, 1.55rem);
+    font-size: clamp(1.2rem, 6vw, 1.9rem);
     font-weight: 800;
     text-transform: uppercase;
     transition: border-color 0.15s;

@@ -106,7 +106,7 @@
     background: var(--color-paper);
   }
   .game {
-    margin: 2.4rem auto 0;
+    margin: 1.6rem auto 0;
     text-align: center;
   }
   h1 {

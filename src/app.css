@@ -48,6 +48,8 @@
   box-sizing: border-box;
 }
 html {
+  /* Увесь UI в rem: масштабуємо від висоти вікна, щоб гра влазила без скролу. */
+  font-size: clamp(16px, min(1.95dvh, 2.8vw), 40px);
   background: var(--color-paper);
   color: var(--color-ink);
 }
