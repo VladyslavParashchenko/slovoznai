@@ -85,7 +85,7 @@
   .tile.correct {
     border-color: var(--color-correct);
     background: var(--color-correct);
-    color: var(--color-accent-contrast);
+    color: var(--color-correct-contrast);
   }
   .tile.present {
     border-color: var(--color-present);

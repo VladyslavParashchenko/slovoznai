@@ -104,7 +104,7 @@
   }
   .key.correct {
     background: var(--color-correct);
-    color: var(--color-accent-contrast);
+    color: var(--color-correct-contrast);
   }
   .key.present {
     background: var(--color-present);

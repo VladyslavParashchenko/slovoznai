@@ -2,7 +2,7 @@ import { scoreGuess } from "./game"
 
 const SHARE_SYMBOLS = {
   correct: "🟧",
-  present: "⬜",
+  present: "🟨",
   absent: "⬛",
   empty: "⬛",
 }

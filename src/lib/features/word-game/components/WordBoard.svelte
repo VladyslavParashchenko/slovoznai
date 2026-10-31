@@ -110,7 +110,7 @@
   .tile.correct {
     --tile-bg: var(--color-correct);
     --tile-border: var(--color-correct);
-    --tile-color: var(--color-accent-contrast);
+    --tile-color: var(--color-correct-contrast);
   }
   .tile.present {
     --tile-bg: var(--color-present);

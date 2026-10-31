@@ -21,8 +21,9 @@
   --color-accent-soft: #ffe1cc;
   --color-accent-contrast: #2b1a0a;
   --color-correct: #f36b00;
-  --color-present: #b0b0b0;
-  --color-present-contrast: #242424;
+  --color-correct-contrast: #fff;
+  --color-present: #f5d000;
+  --color-present-contrast: #fff;
   --color-absent: #777777;
 }
 
@@ -39,8 +40,9 @@
   --color-accent-soft: #572f14;
   --color-accent-contrast: #21150b;
   --color-correct: #ff7800;
-  --color-present: #aaaaaa;
-  --color-present-contrast: #242424;
+  --color-correct-contrast: #fff;
+  --color-present: #e8c400;
+  --color-present-contrast: #fff;
   --color-absent: #7a7a7a;
 }
 

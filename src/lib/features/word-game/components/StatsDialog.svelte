@@ -165,7 +165,7 @@
   }
   .bar.highlight {
     background: var(--color-correct);
-    color: var(--color-accent-contrast);
+    color: var(--color-correct-contrast);
   }
   .footer {
     display: flex;
