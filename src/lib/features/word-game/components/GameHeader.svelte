@@ -14,7 +14,7 @@
 
 <header>
   <button class="brand" onclick={onLogoClick} aria-label="Словознай — слово дня"
-    ><img src={logoWordmark} alt="" width="207" height="52" /></button
+    ><img src={logoWordmark} alt="" width="199" height="52" /></button
   >
   <div class="actions">
     <ThemeToggle />
