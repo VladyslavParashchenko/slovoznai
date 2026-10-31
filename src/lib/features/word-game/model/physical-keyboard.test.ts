@@ -27,9 +27,11 @@ describe("getGameKey", () => {
     expect(press({ key: "'", code: "Quote" })).toBe("є")
   })
 
-  it("розпізнає Enter і Backspace", () => {
+  it("розпізнає Enter, Backspace і стрілки", () => {
     expect(press({ key: "Enter" })).toBe("enter")
     expect(press({ key: "Backspace" })).toBe("backspace")
+    expect(press({ key: "ArrowLeft" })).toBe("arrowleft")
+    expect(press({ key: "ArrowRight" })).toBe("arrowright")
   })
 
   it("ігнорує комбінації, автоповтор Enter і невідомі клавіші", () => {

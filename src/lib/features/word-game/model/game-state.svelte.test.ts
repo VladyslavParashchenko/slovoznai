@@ -7,7 +7,9 @@ import {
   vi,
   type Mock,
 } from "vitest"
+import { ACCEPTED_WORDS } from "../data/dictionary"
 import { getDailyWord } from "./daily"
+import { getKnownLetters } from "./game"
 import { ATTEMPT_LIMIT, WordGameState } from "./game-state.svelte"
 
 const TODAY = new Date(2026, 9, 30, 12)
@@ -24,8 +26,12 @@ function createGame() {
   return game
 }
 
-function guess(word: string) {
+function type(word: string) {
   for (const letter of word) game.press(letter)
+}
+
+function guess(word: string) {
+  type(word)
   game.press("enter")
   vi.runAllTimers()
 }
@@ -53,10 +59,70 @@ describe("набір слова", () => {
 
   it("обмежує чернетку довжиною слова і стирає літери", () => {
     for (const letter of "подивись") game.press(letter)
-    expect(game.draft).toBe("подив")
+    expect(game.draft.join("")).toBe("подив")
 
     game.press("backspace")
-    expect(game.draft).toBe("поди")
+    expect(game.draft.join("")).toBe("поди")
+    game.press("backspace")
+    expect(game.draft.join("")).toBe("под")
+  })
+
+  it("вписує літеру в обрану клітинку і йде далі по порядку", () => {
+    type("по")
+    game.select(3)
+    game.press("и")
+    expect(game.draft).toEqual(["п", "о", "", "и", ""])
+    expect(game.cursor).toBe(4)
+
+    game.select(2)
+    type("д")
+    expect(game.cursor).toBe(3)
+    game.select(4)
+    type("в")
+    expect(game.draft.join("")).toBe("подив")
+  })
+
+  it("Backspace без літер ліворуч стирає останню літеру рядка", () => {
+    type("по")
+    game.select(0)
+    game.press("backspace")
+    expect(game.draft.join("")).toBe("о")
+    game.press("backspace")
+    expect(game.draft.join("")).toBe("")
+    expect(game.cursor).toBe(1)
+  })
+
+  it("стрілки рухають курсор у межах рядка", () => {
+    game.press("arrowleft")
+    expect(game.cursor).toBe(0)
+    for (let step = 0; step < 9; step++) game.press("arrowright")
+    expect(game.cursor).toBe(4)
+  })
+
+  it("новий рядок починається з відгаданих літер, але набір іде з початку", () => {
+    const hint = [...ACCEPTED_WORDS].find(
+      (word) =>
+        word !== TARGET &&
+        word.length === TARGET.length &&
+        word[0] === TARGET[0] &&
+        word[1] !== TARGET[1],
+    )!
+    guess(hint)
+
+    expect(game.draft).toEqual(getKnownLetters([hint], TARGET))
+    expect(game.draft[0]).toBe(TARGET[0])
+    expect(game.cursor).toBe(0)
+
+    type(TARGET)
+    expect(game.draft.join("")).toBe(TARGET)
+  })
+
+  it("курсор недоступний під час анімації і після кінця гри", () => {
+    type(TARGET)
+    game.press("enter")
+    expect(game.editCursor).toBeNull()
+    vi.runAllTimers()
+    expect(game.editCursor).toBeNull()
   })
 })
 
@@ -65,7 +131,7 @@ describe("перевірка спроби", () => {
     ["коротке слово", "под", "Потрібно 5 літер"],
     ["слово не зі словника", "ааааа", "Такого слова немає у словнику"],
   ])("відхиляє %s", (_, word, message) => {
-    for (const letter of word) game.press(letter)
+    type(word)
     game.press("enter")
 
     expect(game.guesses).toEqual([])
@@ -87,7 +153,7 @@ describe("перевірка спроби", () => {
 
   it("не приймає те саме слово двічі", () => {
     guess("подив")
-    for (const letter of "подив") game.press(letter)
+    type("подив")
     game.press("enter")
 
     expect(game.guesses).toEqual(["подив"])
@@ -114,7 +180,7 @@ describe("слово дня", () => {
     guess(TARGET)
     game.press("а")
 
-    expect(game.draft).toBe("")
+    expect(game.draft).toEqual([])
   })
 
   it("поразка показує загадане слово", () => {

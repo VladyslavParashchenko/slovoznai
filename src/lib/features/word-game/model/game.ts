@@ -35,7 +35,7 @@ export function scoreGuess(guess: string, target: string): LetterState[] {
 
 export function createBoardRows(
   guesses: string[],
-  draft: string,
+  draft: string[],
   target: string,
   attemptLimit: number,
 ): BoardCell[][] {
@@ -76,4 +76,13 @@ export function getKeyboardStates(
     })
   })
   return states
+}
+
+/** Літери, що вже стояли на своєму місці; остання лишається порожньою, щоб не вписати відповідь за гравця. */
+export function getKnownLetters(guesses: string[], target: string) {
+  const known = Array.from(target, (letter, index) =>
+    guesses.some((guess) => guess[index] === letter) ? letter : "",
+  )
+  if (known.every(Boolean)) known[known.length - 1] = ""
+  return known
 }

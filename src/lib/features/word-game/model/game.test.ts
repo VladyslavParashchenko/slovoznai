@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
   createBoardRows,
+  getKnownLetters,
   getKeyboardStates,
   normalizeWord,
   scoreGuess,
@@ -54,7 +55,7 @@ describe("scoreGuess", () => {
 
 describe("createBoardRows", () => {
   it("будує поле зі спроб, чернетки та порожніх рядків", () => {
-    const rows = createBoardRows(["подив"], "чо", "честь", 6)
+    const rows = createBoardRows(["подив"], ["ч", "о"], "честь", 6)
 
     expect(rows).toHaveLength(6)
     expect(rows[0].map((cell) => cell.letter).join("")).toBe("подив")
@@ -62,6 +63,28 @@ describe("createBoardRows", () => {
     expect(rows[1].map((cell) => cell.letter)).toEqual(["ч", "о", "", "", ""])
     expect(rows[1].every((cell) => cell.state === "empty")).toBe(true)
     expect(rows[2].every((cell) => cell.letter === "")).toBe(true)
+  })
+})
+
+describe("getKnownLetters", () => {
+  it("збирає літери, які вже стояли на своєму місці", () => {
+    expect(getKnownLetters(["часто", "місто"], "честь")).toEqual([
+      "ч",
+      "",
+      "с",
+      "т",
+      "",
+    ])
+  })
+
+  it("не вписує відповідь повністю", () => {
+    expect(getKnownLetters(["часто", "мость"], "часть")).toEqual([
+      "ч",
+      "а",
+      "с",
+      "т",
+      "",
+    ])
   })
 })
 

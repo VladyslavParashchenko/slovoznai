@@ -12,12 +12,16 @@
     revealRow,
     shakeRow,
     winRow,
+    cursor,
+    onSelect,
   }: {
     rows: BoardCell[][]
     activeRow: number | null
     revealRow: number | null
     shakeRow: number | null
     winRow: number | null
+    cursor: number | null
+    onSelect: (index: number) => void
   } = $props()
 
   const STATE_LABELS: Record<LetterState, string> = {
@@ -27,7 +31,11 @@
     empty: "",
   }
 
-  function cellLabel(cell: BoardCell) {
+  function cellLabel(cell: BoardCell, index: number) {
+    return `Літера ${index + 1}: ${cellText(cell)}`
+  }
+
+  function cellText(cell: BoardCell) {
     if (!cell.letter) return "порожньо"
     const letter = cell.letter.toUpperCase()
     return cell.state === "empty"
@@ -54,20 +62,27 @@
       aria-label="Спроба {rowIndex + 1}"
     >
       {#each row as cell, cellIndex (`${rowIndex}-${cellIndex}`)}
-        <div
+        {@const active = rowIndex === activeRow}
+        <svelte:element
+          this={active ? "button" : "div"}
           class:filled={cell.letter}
           class:correct={cell.state === "correct"}
           class:present={cell.state === "present"}
           class:absent={cell.state === "absent"}
           class:reveal={rowIndex === revealRow}
           class:win={rowIndex === winRow}
+          class:selected={active && cellIndex === cursor}
           class="tile"
           style:--index={cellIndex}
-          role="img"
-          aria-label={cellLabel(cell)}
+          role={active ? undefined : "img"}
+          type={active ? "button" : undefined}
+          disabled={active ? cursor === null : undefined}
+          aria-label={cellLabel(cell, cellIndex)}
+          aria-current={active && cellIndex === cursor ? "true" : undefined}
+          onclick={active ? () => onSelect(cellIndex) : undefined}
         >
           {cell.letter}
-        </div>
+        </svelte:element>
       {/each}
     </div>
   {/each}
@@ -102,6 +117,17 @@
     text-transform: uppercase;
     transition: border-color 0.15s;
     user-select: none;
+  }
+  button.tile {
+    padding: 0;
+    font-family: inherit;
+  }
+  button.tile:enabled {
+    cursor: pointer;
+  }
+  .tile.selected {
+    border-color: var(--color-accent);
+    box-shadow: inset 0 0 0 1.5px var(--color-accent);
   }
   .tile.filled {
     border-color: var(--color-muted);

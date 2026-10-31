@@ -7,10 +7,12 @@ export function getGameKey(event: KeyboardEvent): string | null {
   if (event.key === "Enter") {
     const activatesFocusedButton =
       event.target instanceof HTMLButtonElement &&
-      !event.target.closest(".keyboard")
+      !event.target.closest(".keyboard, .board")
     return event.repeat || activatesFocusedButton ? null : "enter"
   }
   if (event.key === "Backspace") return "backspace"
+  if (event.key === "ArrowLeft") return "arrowleft"
+  if (event.key === "ArrowRight") return "arrowright"
 
   const letter = normalizeWord(event.key)
   return letter.length === 1 ? letter : (PHYSICAL_KEY_MAP[event.code] ?? null)

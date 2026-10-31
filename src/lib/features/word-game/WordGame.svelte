@@ -26,7 +26,7 @@
     if (!game.stats.played && !game.guesses.length) dialog = "help"
 
     const handleKey = (event: KeyboardEvent) => {
-      const key = dialog ? null : getGameKey(event)
+      const key = dialog || game.isFinished ? null : getGameKey(event)
       if (!key) return
       event.preventDefault()
       game.press(key)
@@ -63,6 +63,8 @@
       revealRow={game.revealRow}
       shakeRow={game.shakeRow}
       winRow={game.winRow}
+      cursor={game.editCursor}
+      onSelect={(index) => game.select(index)}
     />
     <GameMessage message={game.message} success={game.showResult && game.won} />
     {#if game.showResult}

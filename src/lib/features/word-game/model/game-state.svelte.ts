@@ -1,6 +1,6 @@
 import { ACCEPTED_WORDS } from "../data/dictionary"
 import { getDailyWord, getDayNumber, getRandomWord } from "./daily"
-import { createBoardRows, getKeyboardStates } from "./game"
+import { createBoardRows, getKeyboardStates, getKnownLetters } from "./game"
 import { buildShareText } from "./share"
 import { createEmptyStats, getActiveStreak, recordResult } from "./stats"
 import { loadDailyGame, loadStats, saveDailyGame, saveStats } from "./storage"
@@ -32,7 +32,8 @@ export class WordGameState {
   day = $state(0)
   target = $state("")
   guesses = $state<string[]>([])
-  draft = $state("")
+  draft = $state<string[]>([])
+  cursor = $state(0)
   message = $state("")
   revealRow = $state<number | null>(null)
   shakeRow = $state<number | null>(null)
@@ -53,6 +54,9 @@ export class WordGameState {
     createBoardRows(this.guesses, this.draft, this.target, ATTEMPT_LIMIT),
   )
   activeRow = $derived(this.isFinished ? null : this.guesses.length)
+  editCursor = $derived(
+    this.isFinished || this.isRevealing ? null : this.cursor,
+  )
   streak = $derived(getActiveStreak(this.stats, this.day))
 
   #reduceMotion: boolean
@@ -102,9 +106,19 @@ export class WordGameState {
   press(key: string) {
     if (this.isFinished || this.isRevealing) return
     if (key === "enter") return this.#submit()
-    if (key === "backspace") this.draft = this.draft.slice(0, -1)
-    else if (this.draft.length < this.target.length) this.draft += key
+    if (key === "backspace") this.#erase()
+    else if (key === "arrowleft") this.select(this.cursor - 1)
+    else if (key === "arrowright") this.select(this.cursor + 1)
+    else if (this.cursor < this.target.length) {
+      this.draft[this.cursor] = key
+      this.cursor++
+    }
     if (this.message) this.#showMessage("")
+  }
+
+  select(index: number) {
+    if (this.editCursor === null) return
+    this.cursor = Math.min(Math.max(index, 0), this.target.length - 1)
   }
 
   shareText() {
@@ -116,19 +130,39 @@ export class WordGameState {
     clearTimeout(this.#messageTimer)
   }
 
+  #erase() {
+    if (this.draft[this.cursor]) {
+      this.draft[this.cursor] = ""
+      return
+    }
+    const before = this.draft.findLastIndex(
+      (letter, index) => letter && index < this.cursor,
+    )
+    const index = before === -1 ? this.draft.findLastIndex(Boolean) : before
+    if (index === -1) return
+    this.draft[index] = ""
+    this.cursor = index
+  }
+
+  #startRow() {
+    this.draft = getKnownLetters(this.guesses, this.target)
+    this.cursor = 0
+  }
+
   #submit() {
-    if (this.draft.length !== this.target.length) {
+    const word = this.draft.join("")
+    if (word.length !== this.target.length) {
       return this.#reject(`Потрібно ${this.target.length} літер`)
     }
-    if (!ACCEPTED_WORDS.has(this.draft)) {
+    if (!ACCEPTED_WORDS.has(word)) {
       return this.#reject("Такого слова немає у словнику")
     }
-    if (this.guesses.includes(this.draft)) {
+    if (this.guesses.includes(word)) {
       return this.#reject("Це слово вже було")
     }
 
-    this.guesses = [...this.guesses, this.draft]
-    this.draft = ""
+    this.guesses = [...this.guesses, word]
+    this.draft = []
     this.#showMessage("")
     const row = this.guesses.length - 1
 
@@ -147,7 +181,7 @@ export class WordGameState {
     this.revealRow = row
     this.#later(() => {
       this.revealRow = null
-      if (!this.isFinished) return
+      if (!this.isFinished) return this.#startRow()
       this.#showMessage(this.#finalMessage())
       if (this.won) this.winRow = row
       if (this.mode === "daily")
@@ -173,7 +207,7 @@ export class WordGameState {
     this.#cancelPending()
     this.target = target
     this.guesses = guesses
-    this.draft = ""
+    this.#startRow()
     this.revealRow = null
     this.shakeRow = null
     this.winRow = null
