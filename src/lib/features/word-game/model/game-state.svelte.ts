@@ -4,7 +4,7 @@ import { createBoardRows, getKeyboardStates, getKnownLetters } from "./game"
 import { buildShareText } from "./share"
 import { createEmptyStats, getActiveStreak, recordResult } from "./stats"
 import { loadDailyGame, loadStats, saveDailyGame, saveStats } from "./storage"
-import type { GameMode } from "./types"
+import type { DraftCell, GameMode } from "./types"
 
 export const ATTEMPT_LIMIT = 6
 
@@ -32,7 +32,7 @@ export class WordGameState {
   day = $state(0)
   target = $state("")
   guesses = $state<string[]>([])
-  draft = $state<string[]>([])
+  draft = $state<DraftCell[]>([])
   cursor = $state(0)
   message = $state("")
   revealRow = $state<number | null>(null)
@@ -53,6 +53,7 @@ export class WordGameState {
   rows = $derived(
     createBoardRows(this.guesses, this.draft, this.target, ATTEMPT_LIMIT),
   )
+  draftWord = $derived(this.draft.map((cell) => cell.letter).join(""))
   activeRow = $derived(this.isFinished ? null : this.guesses.length)
   editCursor = $derived(
     this.isFinished || this.isRevealing ? null : this.cursor,
@@ -107,11 +108,11 @@ export class WordGameState {
     if (this.isFinished || this.isRevealing) return
     if (key === "enter") return this.#submit()
     if (key === "backspace") this.#erase()
-    else if (key === "arrowleft") this.select(this.cursor - 1)
-    else if (key === "arrowright") this.select(this.cursor + 1)
+    else if (key === "arrowleft") this.#step(-1)
+    else if (key === "arrowright") this.#step(1)
     else if (this.cursor < this.target.length) {
-      this.draft[this.cursor] = key
-      this.cursor++
+      this.draft[this.cursor] = { letter: key, hint: false }
+      this.cursor = this.#nextFree(this.cursor + 1)
     }
     if (this.message) this.#showMessage("")
   }
@@ -130,27 +131,46 @@ export class WordGameState {
     clearTimeout(this.#messageTimer)
   }
 
+  /** Стирає обрану клітинку, інакше найближчу набрану ліворуч; підказку — лише коли її обрано. */
   #erase() {
-    if (this.draft[this.cursor]) {
-      this.draft[this.cursor] = ""
-      return
-    }
-    const before = this.draft.findLastIndex(
-      (letter, index) => letter && index < this.cursor,
-    )
-    const index = before === -1 ? this.draft.findLastIndex(Boolean) : before
+    const index = this.draft[this.cursor]?.letter
+      ? this.cursor
+      : this.draft.findLastIndex(
+          (cell, index) => cell.letter && !cell.hint && index < this.cursor,
+        )
     if (index === -1) return
-    this.draft[index] = ""
+    this.draft[index] = { letter: "", hint: false }
     this.cursor = index
   }
 
+  /** Стрілки, як і набір, перескакують підказки; обрати підказку можна натиском. */
+  #step(direction: 1 | -1) {
+    for (
+      let index = this.cursor + direction;
+      index >= 0 && index < this.target.length;
+      index += direction
+    ) {
+      if (!this.draft[index].hint) return (this.cursor = index)
+    }
+  }
+
+  #nextFree(from: number) {
+    const index = this.draft.findIndex((cell, i) => !cell.hint && i >= from)
+    return index === -1 ? this.target.length : index
+  }
+
   #startRow() {
-    this.draft = getKnownLetters(this.guesses, this.target)
-    this.cursor = 0
+    this.draft = this.isFinished
+      ? []
+      : getKnownLetters(this.guesses, this.target).map((letter) => ({
+          letter,
+          hint: Boolean(letter),
+        }))
+    this.cursor = this.#nextFree(0)
   }
 
   #submit() {
-    const word = this.draft.join("")
+    const word = this.draftWord
     if (word.length !== this.target.length) {
       return this.#reject(`Потрібно ${this.target.length} літер`)
     }

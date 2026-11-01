@@ -3,6 +3,13 @@ export type LetterState = "correct" | "present" | "absent" | "empty"
 export interface BoardCell {
   letter: string
   state: LetterState
+  hint?: boolean
+}
+
+/** Клітинка рядка, що набирається; `hint` — літеру підставлено з попередніх спроб. */
+export interface DraftCell {
+  letter: string
+  hint: boolean
 }
 
 export type KeyboardStates = Record<string, LetterState>

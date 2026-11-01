@@ -38,6 +38,7 @@
   function cellText(cell: BoardCell) {
     if (!cell.letter) return "порожньо"
     const letter = cell.letter.toUpperCase()
+    if (cell.hint) return `${letter} — підказка`
     return cell.state === "empty"
       ? letter
       : `${letter} — ${STATE_LABELS[cell.state]}`
@@ -66,6 +67,7 @@
         <svelte:element
           this={active ? "button" : "div"}
           class:filled={cell.letter}
+          class:hint={cell.hint}
           class:correct={cell.state === "correct"}
           class:present={cell.state === "present"}
           class:absent={cell.state === "absent"}
@@ -124,6 +126,10 @@
   }
   button.tile:enabled {
     cursor: pointer;
+  }
+  .tile.hint {
+    color: color-mix(in srgb, var(--color-ink) 40%, transparent);
+    animation: none;
   }
   .tile.selected {
     border-color: var(--color-accent);

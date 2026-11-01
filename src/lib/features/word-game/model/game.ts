@@ -1,4 +1,4 @@
-import type { BoardCell, KeyboardStates, LetterState } from "./types"
+import type { BoardCell, DraftCell, KeyboardStates, LetterState } from "./types"
 
 const STATE_PRIORITY: Record<Exclude<LetterState, "empty">, number> = {
   absent: 0,
@@ -35,12 +35,14 @@ export function scoreGuess(guess: string, target: string): LetterState[] {
 
 export function createBoardRows(
   guesses: string[],
-  draft: string[],
+  draft: DraftCell[],
   target: string,
   attemptLimit: number,
 ): BoardCell[][] {
   return Array.from({ length: attemptLimit }, (_, rowIndex) => {
-    const word = guesses[rowIndex] ?? (rowIndex === guesses.length ? draft : "")
+    const isDraft = rowIndex === guesses.length
+    const word =
+      guesses[rowIndex] ?? (isDraft ? draft.map((cell) => cell.letter) : "")
     const states = guesses[rowIndex]
       ? scoreGuess(guesses[rowIndex], target)
       : []
@@ -48,6 +50,7 @@ export function createBoardRows(
     return Array.from({ length: target.length }, (_, columnIndex) => ({
       letter: word[columnIndex] ?? "",
       state: states[columnIndex] ?? "empty",
+      hint: isDraft && Boolean(draft[columnIndex]?.hint),
     }))
   })
 }

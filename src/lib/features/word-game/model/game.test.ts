@@ -55,13 +55,28 @@ describe("scoreGuess", () => {
 
 describe("createBoardRows", () => {
   it("будує поле зі спроб, чернетки та порожніх рядків", () => {
-    const rows = createBoardRows(["подив"], ["ч", "о"], "честь", 6)
+    const rows = createBoardRows(
+      ["подив"],
+      [
+        { letter: "ч", hint: true },
+        { letter: "о", hint: false },
+      ],
+      "честь",
+      6,
+    )
 
     expect(rows).toHaveLength(6)
     expect(rows[0].map((cell) => cell.letter).join("")).toBe("подив")
     expect(rows[0].every((cell) => cell.state === "absent")).toBe(true)
     expect(rows[1].map((cell) => cell.letter)).toEqual(["ч", "о", "", "", ""])
     expect(rows[1].every((cell) => cell.state === "empty")).toBe(true)
+    expect(rows[1].map((cell) => cell.hint)).toEqual([
+      true,
+      false,
+      false,
+      false,
+      false,
+    ])
     expect(rows[2].every((cell) => cell.letter === "")).toBe(true)
   })
 })

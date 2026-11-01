@@ -30,8 +30,12 @@ function type(word: string) {
   for (const letter of word) game.press(letter)
 }
 
+/** Вписує слово поверх усього рядка, включно з підказками. */
 function guess(word: string) {
-  type(word)
+  ;[...word].forEach((letter, index) => {
+    game.select(index)
+    game.press(letter)
+  })
   game.press("enter")
   vi.runAllTimers()
 }
@@ -59,19 +63,25 @@ describe("набір слова", () => {
 
   it("обмежує чернетку довжиною слова і стирає літери", () => {
     for (const letter of "подивись") game.press(letter)
-    expect(game.draft.join("")).toBe("подив")
+    expect(game.draftWord).toBe("подив")
 
     game.press("backspace")
-    expect(game.draft.join("")).toBe("поди")
+    expect(game.draftWord).toBe("поди")
     game.press("backspace")
-    expect(game.draft.join("")).toBe("под")
+    expect(game.draftWord).toBe("под")
   })
 
   it("вписує літеру в обрану клітинку і йде далі по порядку", () => {
     type("по")
     game.select(3)
     game.press("и")
-    expect(game.draft).toEqual(["п", "о", "", "и", ""])
+    expect(game.draft.map((cell) => cell.letter)).toEqual([
+      "п",
+      "о",
+      "",
+      "и",
+      "",
+    ])
     expect(game.cursor).toBe(4)
 
     game.select(2)
@@ -79,17 +89,17 @@ describe("набір слова", () => {
     expect(game.cursor).toBe(3)
     game.select(4)
     type("в")
-    expect(game.draft.join("")).toBe("подив")
+    expect(game.draftWord).toBe("подив")
   })
 
-  it("Backspace без літер ліворуч стирає останню літеру рядка", () => {
+  it("Backspace не стирає літери праворуч від курсора", () => {
     type("по")
     game.select(0)
     game.press("backspace")
-    expect(game.draft.join("")).toBe("о")
+    expect(game.draftWord).toBe("о")
     game.press("backspace")
-    expect(game.draft.join("")).toBe("")
-    expect(game.cursor).toBe(1)
+    expect(game.draftWord).toBe("о")
+    expect(game.cursor).toBe(0)
   })
 
   it("стрілки рухають курсор у межах рядка", () => {
@@ -99,22 +109,55 @@ describe("набір слова", () => {
     expect(game.cursor).toBe(4)
   })
 
-  it("новий рядок починається з відгаданих літер, але набір іде з початку", () => {
-    const hint = [...ACCEPTED_WORDS].find(
-      (word) =>
-        word !== TARGET &&
-        word.length === TARGET.length &&
-        word[0] === TARGET[0] &&
-        word[1] !== TARGET[1],
-    )!
-    guess(hint)
+  describe("підказки з відгаданих літер", () => {
+    let hint: string
 
-    expect(game.draft).toEqual(getKnownLetters([hint], TARGET))
-    expect(game.draft[0]).toBe(TARGET[0])
-    expect(game.cursor).toBe(0)
+    beforeEach(() => {
+      hint = [...ACCEPTED_WORDS].find(
+        (word) =>
+          word !== TARGET &&
+          word.length === TARGET.length &&
+          word[0] === TARGET[0] &&
+          word[1] !== TARGET[1],
+      )!
+      guess(hint)
+    })
 
-    type(TARGET)
-    expect(game.draft.join("")).toBe(TARGET)
+    it("підставляються в новий рядок, набір їх перескакує", () => {
+      expect(game.draft.map((cell) => cell.letter)).toEqual(
+        getKnownLetters([hint], TARGET),
+      )
+      expect(game.draft[0].hint).toBe(true)
+      expect(game.cursor).toBe(game.draft.findIndex((cell) => !cell.hint))
+
+      type([...TARGET].filter((_, index) => !game.draft[index].hint).join(""))
+      expect(game.draftWord).toBe(TARGET)
+    })
+
+    it("Backspace їх не чіпає, але обрану підказку стирає", () => {
+      type(TARGET.slice(1, 2))
+      game.press("backspace")
+      game.press("backspace")
+      expect(game.draft[0].letter).toBe(TARGET[0])
+
+      game.select(0)
+      game.press("backspace")
+      expect(game.draft[0].letter).toBe("")
+      expect(game.draft[0].hint).toBe(false)
+    })
+
+    it("стрілки перескакують підказки", () => {
+      const free = game.cursor
+      game.press("arrowleft")
+      expect(game.cursor).toBe(free)
+    })
+
+    it("вписана в обрану підказку літера стає звичайною", () => {
+      game.select(0)
+      game.press("я")
+      expect(game.draft[0].letter).toBe("я")
+      expect(game.draft[0].hint).toBe(false)
+    })
   })
 
   it("курсор недоступний під час анімації і після кінця гри", () => {
@@ -205,6 +248,8 @@ describe("слово дня", () => {
     guess(TARGET)
     createGame()
 
+    expect(game.draft).toEqual([])
+    expect(game.rows[1].every((cell) => !cell.letter && !cell.hint)).toBe(true)
     expect(game.showResult).toBe(true)
     expect(game.message).toBe("Геніально!")
     expect(game.stats.played).toBe(1)
