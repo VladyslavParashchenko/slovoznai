@@ -95,7 +95,7 @@
   .tile.absent {
     border-color: var(--color-absent);
     background: var(--color-absent);
-    color: #fff;
+    color: var(--color-absent-contrast);
   }
   .note {
     margin: 1.2rem 0 0;

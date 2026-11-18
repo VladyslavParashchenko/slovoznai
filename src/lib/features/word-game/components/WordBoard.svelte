@@ -169,7 +169,7 @@
   .tile.absent {
     --tile-bg: var(--color-absent);
     --tile-border: var(--color-absent);
-    --tile-color: #fff;
+    --tile-color: var(--color-absent-contrast);
   }
   .tile.correct,
   .tile.present,

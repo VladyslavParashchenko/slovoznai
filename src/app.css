@@ -24,7 +24,10 @@
   --color-correct-contrast: #fff;
   --color-present: #f5d000;
   --color-present-contrast: #fff;
-  --color-absent: #777777;
+  --color-key: #777777;
+  --color-key-contrast: #fff;
+  --color-absent: #e1e1e1;
+  --color-absent-contrast: #626262;
 }
 
 :root[data-theme="dark"] {
@@ -43,7 +46,10 @@
   --color-correct-contrast: #fff;
   --color-present: #e8c400;
   --color-present-contrast: #fff;
-  --color-absent: #7a7a7a;
+  --color-key: #7a7a7a;
+  --color-key-contrast: #fff;
+  --color-absent: #434343;
+  --color-absent-contrast: #cecece;
 }
 
 * {

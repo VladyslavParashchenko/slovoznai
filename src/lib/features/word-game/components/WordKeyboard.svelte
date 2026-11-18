@@ -80,8 +80,8 @@
     padding: 0;
     border: 0;
     border-radius: 0.35rem;
-    background: var(--color-surface-muted);
-    color: var(--color-ink);
+    background: var(--color-key);
+    color: var(--color-key-contrast);
     font-size: 1.05rem;
     font-weight: 800;
     text-transform: uppercase;
@@ -91,6 +91,7 @@
   }
   .key:hover:not(:disabled, .correct, .present, .absent) {
     background: var(--color-accent-soft);
+    color: var(--color-ink);
   }
   .key:active:not(:disabled) {
     transform: scale(0.92);
@@ -112,7 +113,7 @@
   }
   .key.absent {
     background: var(--color-absent);
-    color: #fff;
+    color: var(--color-absent-contrast);
   }
   .key.special {
     width: 4.2rem;

@@ -158,8 +158,8 @@
     min-width: 1.6rem;
     padding: 0.2rem 0.5rem;
     border-radius: 0.3rem;
-    background: var(--color-absent);
-    color: #fff;
+    background: var(--color-key);
+    color: var(--color-key-contrast);
     text-align: right;
     transition: width 0.4s ease-out;
   }
