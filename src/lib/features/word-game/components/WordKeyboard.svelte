@@ -59,8 +59,8 @@
 <style>
   .keyboard {
     display: grid;
-    gap: 0.35rem;
-    margin: 1rem auto 0;
+    gap: clamp(0.25rem, 0.8dvh, 0.35rem);
+    width: 100%;
     touch-action: manipulation;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -76,7 +76,7 @@
   .key {
     flex: none;
     width: min(2.25rem, calc((100% - 2.75rem) / 12));
-    height: 2.8rem;
+    height: clamp(2.25rem, 6.2dvh, var(--key-max, 2.8rem));
     padding: 0;
     border: 0;
     border-radius: 0.35rem;
@@ -124,7 +124,7 @@
   }
   @media (max-width: 420px) {
     .key {
-      height: 2.65rem;
+      --key-max: 2.65rem;
     }
     .key.special {
       width: 4rem;

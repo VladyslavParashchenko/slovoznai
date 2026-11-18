@@ -45,76 +45,93 @@
   }
 </script>
 
-<div
-  class="board"
-  role="group"
-  aria-label="Ігрове поле"
-  style:--flip-ms="{TILE_FLIP_MS}ms"
-  style:--stagger-ms="{TILE_STAGGER_MS}ms"
-  style:--shake-ms="{SHAKE_MS}ms"
->
-  {#each rows as row, rowIndex (rowIndex)}
-    <div
-      class:active-row={rowIndex === activeRow}
-      class:shake={rowIndex === shakeRow}
-      class="word-row"
-      style:--columns={row.length}
-      role="group"
-      aria-label="Спроба {rowIndex + 1}"
-    >
-      {#each row as cell, cellIndex (`${rowIndex}-${cellIndex}`)}
-        {@const active = rowIndex === activeRow}
-        <svelte:element
-          this={active ? "button" : "div"}
-          class:filled={cell.letter}
-          class:hint={cell.hint}
-          class:correct={cell.state === "correct"}
-          class:present={cell.state === "present"}
-          class:absent={cell.state === "absent"}
-          class:reveal={rowIndex === revealRow}
-          class:win={rowIndex === winRow}
-          class:selected={active && cellIndex === cursor}
-          class="tile"
-          style:--index={cellIndex}
-          role={active ? undefined : "img"}
-          type={active ? "button" : undefined}
-          disabled={active ? cursor === null : undefined}
-          aria-label={cellLabel(cell, cellIndex)}
-          aria-current={active && cellIndex === cursor ? "true" : undefined}
-          onclick={active ? () => onSelect(cellIndex) : undefined}
-        >
-          {cell.letter}
-        </svelte:element>
-      {/each}
-    </div>
-  {/each}
+<div class="board-area">
+  <div
+    class="board"
+    role="group"
+    aria-label="Ігрове поле"
+    style:--flip-ms="{TILE_FLIP_MS}ms"
+    style:--stagger-ms="{TILE_STAGGER_MS}ms"
+    style:--shake-ms="{SHAKE_MS}ms"
+    style:--rows={rows.length}
+    style:--columns={rows[0]?.length ?? 1}
+  >
+    {#each rows as row, rowIndex (rowIndex)}
+      <div
+        class:active-row={rowIndex === activeRow}
+        class:shake={rowIndex === shakeRow}
+        class="word-row"
+        role="group"
+        aria-label="Спроба {rowIndex + 1}"
+      >
+        {#each row as cell, cellIndex (`${rowIndex}-${cellIndex}`)}
+          {@const active = rowIndex === activeRow}
+          <svelte:element
+            this={active ? "button" : "div"}
+            class:filled={cell.letter}
+            class:hint={cell.hint}
+            class:correct={cell.state === "correct"}
+            class:present={cell.state === "present"}
+            class:absent={cell.state === "absent"}
+            class:reveal={rowIndex === revealRow}
+            class:win={rowIndex === winRow}
+            class:selected={active && cellIndex === cursor}
+            class="tile"
+            style:--index={cellIndex}
+            role={active ? undefined : "img"}
+            type={active ? "button" : undefined}
+            disabled={active ? cursor === null : undefined}
+            aria-label={cellLabel(cell, cellIndex)}
+            aria-current={active && cellIndex === cursor ? "true" : undefined}
+            onclick={active ? () => onSelect(cellIndex) : undefined}
+          >
+            {cell.letter}
+          </svelte:element>
+        {/each}
+      </div>
+    {/each}
+  </div>
 </div>
 
 <style>
-  .board {
+  /* Поле займає весь вільний простір між заголовком і клавіатурою,
+     а розмір клітинки підбирається так, щоб усі спроби влізли і в ширину, і у висоту. */
+  .board-area {
     display: grid;
-    gap: 0.42rem;
-    margin: 1.25rem auto 1rem;
+    flex: 1 1 0;
+    /* На дуже низьких екранах (телефон у ландшафті) краще прокрутка, ніж зламане поле. */
+    min-height: 11rem;
+    place-items: center;
+    margin: clamp(0.4rem, 1.8dvh, 1.25rem) 0 clamp(0.25rem, 1.2dvh, 1rem);
+    container-type: size;
+  }
+  .board {
+    --gap: 0.42rem;
+    --tile: min(
+      (19rem - (var(--columns) - 1) * var(--gap)) / var(--columns),
+      (100cqw - (var(--columns) - 1) * var(--gap)) / var(--columns),
+      (100cqh - (var(--rows) - 1) * var(--gap)) / var(--rows)
+    );
+    display: grid;
+    gap: var(--gap);
   }
   .word-row {
     display: grid;
-    grid-template-columns: repeat(var(--columns), 1fr);
-    gap: 0.42rem;
-    width: min(100%, 19rem);
-    margin: 0 auto;
+    grid-template-columns: repeat(var(--columns), var(--tile));
+    gap: var(--gap);
   }
   .tile {
     --tile-bg: var(--color-surface);
     --tile-border: var(--color-muted);
     --tile-color: var(--color-ink);
     display: grid;
-    aspect-ratio: 1;
+    height: var(--tile);
     place-items: center;
     border: 1.5px solid var(--color-border);
     border-radius: 0.45rem;
     background: var(--color-surface);
     color: var(--color-ink);
-    font-size: clamp(1.2rem, 6vw, 1.9rem);
+    font-size: calc(var(--tile) * 0.52);
     font-weight: 800;
     text-transform: uppercase;
     transition: border-color 0.15s;

@@ -67,19 +67,23 @@
       onSelect={(index) => game.select(index)}
     />
     <GameMessage message={game.message} success={game.showResult && game.won} />
-    {#if game.showResult}
-      <ResultActions
-        mode={game.mode}
-        onStats={() => (dialog = "stats")}
-        onDaily={() => game.startDaily()}
-        onPractice={() => game.startPractice()}
+    <!-- Кнопки результату стають на місце клавіатури, яка лишається невидимою
+         і тримає висоту, щоб поле не змінювало розмір після кінця гри. -->
+    <div class="controls" class:finished={game.showResult}>
+      <WordKeyboard
+        keyboardStates={game.keyboardStates}
+        disabled={game.isFinished}
+        onKeyPress={(key) => game.press(key)}
       />
-    {/if}
-    <WordKeyboard
-      keyboardStates={game.keyboardStates}
-      disabled={game.isFinished}
-      onKeyPress={(key) => game.press(key)}
-    />
+      {#if game.showResult}
+        <ResultActions
+          mode={game.mode}
+          onStats={() => (dialog = "stats")}
+          onDaily={() => game.startDaily()}
+          onPractice={() => game.startPractice()}
+        />
+      {/if}
+    </div>
   </section>
 </main>
 
@@ -102,13 +106,21 @@
 
 <style>
   .page-shell {
+    --space: clamp(0.4rem, 2dvh, 1.25rem);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     min-height: 100dvh;
-    padding: 1.25rem max(1.25rem, calc((100vw - 31rem) / 2));
-    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+    padding: var(--space) max(1.25rem, calc((100vw - 31rem) / 2));
+    padding-bottom: max(var(--space), env(safe-area-inset-bottom));
     background: var(--color-paper);
   }
   .game {
-    margin: 1.6rem auto 0;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    margin-top: clamp(0.25rem, 2dvh, 1.6rem);
     text-align: center;
   }
   h1 {
@@ -116,9 +128,9 @@
     align-items: center;
     justify-content: center;
     gap: 0.55rem;
-    margin: 0.8rem 0 1.5rem;
+    margin: clamp(0.15rem, 1dvh, 0.8rem) 0 0;
     font-family: var(--font-sans);
-    font-size: clamp(1.65rem, 6vw, 2.4rem);
+    font-size: clamp(1.3rem, min(6vw, 4.2dvh), 2.4rem);
     font-weight: 800;
     line-height: 1.1;
     letter-spacing: -0.04em;
@@ -133,12 +145,18 @@
     border-radius: 50%;
     background: var(--color-accent);
   }
+  .controls {
+    display: grid;
+  }
+  .controls > :global(*) {
+    grid-area: 1 / 1;
+  }
+  .controls.finished > :global(.keyboard) {
+    visibility: hidden;
+  }
   @media (max-width: 420px) {
     .page-shell {
       padding-inline: 0.85rem;
-    }
-    .game {
-      margin-top: 1.8rem;
     }
   }
 </style>

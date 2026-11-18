@@ -32,14 +32,26 @@
   .result-actions {
     display: flex;
     flex-wrap: wrap;
+    align-content: center;
     justify-content: center;
-    gap: 0.5rem;
-    margin: -0.15rem 0 0.9rem;
+    gap: 0.6rem;
+    animation: appear 0.25s ease-out;
   }
   button {
     border-radius: 999px;
-    padding: 0.65rem 1rem;
+    padding: 0.8rem 1.3rem;
     font-weight: 800;
+  }
+  @keyframes appear {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .result-actions {
+      animation: none;
+    }
   }
   .primary {
     border: 0;

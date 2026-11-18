@@ -46,7 +46,7 @@
   .brand img {
     display: block;
     width: auto;
-    height: 3.25rem;
+    height: clamp(2.2rem, 7dvh, var(--logo-max, 3.25rem));
   }
   .actions {
     display: flex;
@@ -54,12 +54,12 @@
   }
   @media (max-width: 400px) {
     .brand img {
-      height: 2.75rem;
+      --logo-max: 2.75rem;
     }
   }
   @media (max-width: 360px) {
     .brand img {
-      height: 2.3rem;
+      --logo-max: 2.3rem;
     }
   }
 </style>
