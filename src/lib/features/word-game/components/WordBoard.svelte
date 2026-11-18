@@ -45,7 +45,11 @@
   }
 </script>
 
-<div class="board-area">
+<div
+  class="board-area"
+  style:--rows={rows.length}
+  style:--columns={rows[0]?.length ?? 1}
+>
   <div
     class="board"
     role="group"
@@ -53,8 +57,6 @@
     style:--flip-ms="{TILE_FLIP_MS}ms"
     style:--stagger-ms="{TILE_STAGGER_MS}ms"
     style:--shake-ms="{SHAKE_MS}ms"
-    style:--rows={rows.length}
-    style:--columns={rows[0]?.length ?? 1}
   >
     {#each rows as row, rowIndex (rowIndex)}
       <div
@@ -100,7 +102,7 @@
     display: grid;
     flex: 1 1 0;
     /* На дуже низьких екранах (телефон у ландшафті) краще прокрутка, ніж зламане поле. */
-    min-height: 11rem;
+    min-height: max(3rem, calc(var(--rows) * 1.85rem));
     place-items: center;
     margin: clamp(0.4rem, 1.8dvh, 1.25rem) 0 clamp(0.25rem, 1.2dvh, 1rem);
     container-type: size;

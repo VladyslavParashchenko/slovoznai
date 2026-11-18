@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { goto } from "$app/navigation"
+  import { resolve } from "$app/paths"
   import { onMount } from "svelte"
+  import ChallengeCreator from "./components/ChallengeCreator.svelte"
   import GameHeader from "./components/GameHeader.svelte"
   import GameMessage from "./components/GameMessage.svelte"
   import HelpDialog from "./components/HelpDialog.svelte"
@@ -7,9 +10,19 @@
   import StatsDialog from "./components/StatsDialog.svelte"
   import WordBoard from "./components/WordBoard.svelte"
   import WordKeyboard from "./components/WordKeyboard.svelte"
+  import { decodeChallenge } from "./model/challenge"
   import { ATTEMPT_LIMIT, WordGameState } from "./model/game-state.svelte"
   import { getGameKey } from "./model/physical-keyboard"
   import { shareResult } from "./model/share"
+
+  /**
+   * `home` — слово дня і тренування; `challenge` — гра за кодом челенджу,
+   * а без коду чи з поламаним кодом — форма, щоб загадати своє слово.
+   */
+  let {
+    page = "home",
+    challengeCode = null,
+  }: { page?: "home" | "challenge"; challengeCode?: string | null } = $props()
 
   let dialog = $state<"help" | "stats" | null>(null)
 
@@ -17,16 +30,39 @@
     reduceMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     onDailyFinish: () => (dialog = "stats"),
   })
-  game.startDaily()
+  // Сторінка перемонтовується при зміні коду, тож читаємо пропси один раз.
+  // svelte-ignore state_referenced_locally
+  const challengeWord =
+    page === "challenge" ? decodeChallenge(challengeCode) : null
+  // svelte-ignore state_referenced_locally
+  const creating = page === "challenge" && !challengeWord
+  // svelte-ignore state_referenced_locally
+  const invalidLink = creating && Boolean(challengeCode)
+  if (challengeWord) game.startChallenge(challengeWord)
+  else game.startDaily()
 
+  const TITLES = {
+    daily: "Слово дня",
+    practice: "Тренування",
+    challenge: "Челендж",
+  } as const
+
+  function startDaily() {
+    if (page === "home") game.startDaily()
+    else goto(resolve("/"))
+  }
+  const createChallenge = () => goto(resolve("/challenge"))
   const closeDialog = () => (dialog = null)
   const share = () => shareResult(`${game.shareText()}\n\n${location.origin}`)
 
   onMount(() => {
-    if (!game.stats.played && !game.guesses.length) dialog = "help"
+    if (!creating && !game.stats.played && !game.guesses.length) {
+      dialog = "help"
+    }
 
     const handleKey = (event: KeyboardEvent) => {
-      const key = dialog || game.isFinished ? null : getGameKey(event)
+      const key =
+        dialog || creating || game.isFinished ? null : getGameKey(event)
       if (!key) return
       event.preventDefault()
       game.press(key)
@@ -47,44 +83,56 @@
 
 <main class="page-shell">
   <GameHeader
-    onLogoClick={() => game.startDaily()}
+    onLogoClick={startDaily}
     onHelp={() => (dialog = "help")}
     onStats={() => (dialog = "stats")}
+    onChallenge={createChallenge}
   />
-  <section class="game" aria-labelledby="game-title">
-    <h1 id="game-title">
-      {game.mode === "daily" ? "Слово дня" : "Тренування"}
-      <span class="title-separator" aria-hidden="true"></span>
-      <em>{game.target.length} літер</em>
-    </h1>
-    <WordBoard
-      rows={game.rows}
-      activeRow={game.activeRow}
-      revealRow={game.revealRow}
-      shakeRow={game.shakeRow}
-      winRow={game.winRow}
-      cursor={game.editCursor}
-      onSelect={(index) => game.select(index)}
-    />
-    <GameMessage message={game.message} success={game.showResult && game.won} />
-    <!-- Кнопки результату стають на місце клавіатури, яка лишається невидимою
-         і тримає висоту, щоб поле не змінювало розмір після кінця гри. -->
-    <div class="controls" class:finished={game.showResult}>
-      <WordKeyboard
-        keyboardStates={game.keyboardStates}
-        disabled={game.isFinished}
-        onKeyPress={(key) => game.press(key)}
+  {#if creating}
+    <section class="game" aria-labelledby="game-title">
+      <h1 id="game-title">Кинути челендж</h1>
+      <ChallengeCreator {invalidLink} keysEnabled={!dialog} />
+    </section>
+  {:else}
+    <section class="game" aria-labelledby="game-title">
+      <h1 id="game-title">
+        {TITLES[game.mode]}
+        <span class="title-separator" aria-hidden="true"></span>
+        <em>{game.target.length} літер</em>
+      </h1>
+      <WordBoard
+        rows={game.rows}
+        activeRow={game.activeRow}
+        revealRow={game.revealRow}
+        shakeRow={game.shakeRow}
+        winRow={game.winRow}
+        cursor={game.editCursor}
+        onSelect={(index) => game.select(index)}
       />
-      {#if game.showResult}
-        <ResultActions
-          mode={game.mode}
-          onStats={() => (dialog = "stats")}
-          onDaily={() => game.startDaily()}
-          onPractice={() => game.startPractice()}
+      <GameMessage
+        message={game.message}
+        success={game.showResult && game.won}
+      />
+      <!-- Кнопки результату стають на місце клавіатури, яка лишається невидимою
+           і тримає висоту, щоб поле не змінювало розмір після кінця гри. -->
+      <div class="controls" class:finished={game.showResult}>
+        <WordKeyboard
+          keyboardStates={game.keyboardStates}
+          disabled={game.isFinished}
+          onKeyPress={(key) => game.press(key)}
         />
-      {/if}
-    </div>
-  </section>
+        {#if game.showResult}
+          <ResultActions
+            mode={game.mode}
+            onStats={() => (dialog = "stats")}
+            onDaily={startDaily}
+            onPractice={() => game.startPractice()}
+            onChallenge={createChallenge}
+          />
+        {/if}
+      </div>
+    </section>
+  {/if}
 </main>
 
 <HelpDialog

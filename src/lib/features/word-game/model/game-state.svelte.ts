@@ -3,7 +3,14 @@ import { getDailyWord, getDayNumber, getRandomWord } from "./daily"
 import { createBoardRows, getKeyboardStates, getKnownLetters } from "./game"
 import { buildShareText } from "./share"
 import { createEmptyStats, getActiveStreak, recordResult } from "./stats"
-import { loadDailyGame, loadStats, saveDailyGame, saveStats } from "./storage"
+import {
+  loadChallengeGame,
+  loadDailyGame,
+  loadStats,
+  saveChallengeGame,
+  saveDailyGame,
+  saveStats,
+} from "./storage"
 import type { DraftCell, GameMode } from "./types"
 
 export const ATTEMPT_LIMIT = 6
@@ -74,24 +81,18 @@ export class WordGameState {
   startDaily() {
     this.mode = "daily"
     this.day = getDayNumber()
-    const word = getDailyWord(this.day)
-    const saved = loadDailyGame(this.day)?.guesses ?? []
-    const restored = saved
-      .filter(
-        (guess) => typeof guess === "string" && guess.length === word.length,
-      )
-      .slice(0, ATTEMPT_LIMIT)
-    const winIndex = restored.indexOf(word)
-    this.#reset(
-      word,
-      winIndex === -1 ? restored : restored.slice(0, winIndex + 1),
-    )
-    if (this.isFinished) this.#showMessage(this.#finalMessage())
+    this.#resume(getDailyWord(this.day), loadDailyGame(this.day)?.guesses ?? [])
   }
 
   startPractice() {
     this.mode = "practice"
     this.#reset(getRandomWord(this.target))
+  }
+
+  /** Слово, загадане іншим гравцем через посилання; результат не йде в статистику. */
+  startChallenge(word: string) {
+    this.mode = "challenge"
+    this.#resume(word, loadChallengeGame(word)?.guesses ?? [])
   }
 
   checkNewDay() {
@@ -120,6 +121,11 @@ export class WordGameState {
   select(index: number) {
     if (this.editCursor === null) return
     this.cursor = Math.min(Math.max(index, 0), this.target.length - 1)
+  }
+
+  /** Повідомлення над клавіатурою, що тримається до першого натискання. */
+  notify(text: string) {
+    this.#showMessage(text)
   }
 
   shareText() {
@@ -186,6 +192,9 @@ export class WordGameState {
     this.#showMessage("")
     const row = this.guesses.length - 1
 
+    if (this.mode === "challenge") {
+      saveChallengeGame({ word: this.target, guesses: this.guesses })
+    }
     if (this.mode === "daily") {
       saveDailyGame({ day: this.day, guesses: this.guesses })
       if (this.isFinished) {
@@ -221,6 +230,22 @@ export class WordGameState {
       this.shakeRow = this.guesses.length
       this.#later(() => (this.shakeRow = null), SHAKE_MS)
     })
+  }
+
+  /** Продовжує збережену партію: відкидає зіпсовані спроби і все після перемоги. */
+  #resume(word: string, saved: unknown[]) {
+    const restored = saved
+      .filter(
+        (guess): guess is string =>
+          typeof guess === "string" && guess.length === word.length,
+      )
+      .slice(0, ATTEMPT_LIMIT)
+    const winIndex = restored.indexOf(word)
+    this.#reset(
+      word,
+      winIndex === -1 ? restored : restored.slice(0, winIndex + 1),
+    )
+    if (this.isFinished) this.#showMessage(this.#finalMessage())
   }
 
   #reset(target: string, guesses: string[] = []) {

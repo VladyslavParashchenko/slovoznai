@@ -1,8 +1,9 @@
 import { createEmptyStats } from "./stats"
-import type { GameStats, SavedDailyGame } from "./types"
+import type { GameStats, SavedChallengeGame, SavedDailyGame } from "./types"
 
 const DAILY_KEY = "slovoznai:daily:v1"
 const STATS_KEY = "slovoznai:stats:v1"
+const CHALLENGE_KEY = "slovoznai:challenge:v1"
 
 function isCount(value: unknown): value is number {
   return Number.isInteger(value) && (value as number) >= 0
@@ -32,6 +33,16 @@ export function loadDailyGame(day: number): SavedDailyGame | null {
 
 export function saveDailyGame(game: SavedDailyGame) {
   write(DAILY_KEY, game)
+}
+
+/** Зберігається лише останній челендж: повернення до нього за тим самим посиланням. */
+export function loadChallengeGame(word: string): SavedChallengeGame | null {
+  const saved = read<SavedChallengeGame>(CHALLENGE_KEY)
+  return saved?.word === word && Array.isArray(saved.guesses) ? saved : null
+}
+
+export function saveChallengeGame(game: SavedChallengeGame) {
+  write(CHALLENGE_KEY, game)
 }
 
 export function loadStats(attemptLimit: number): GameStats | null {

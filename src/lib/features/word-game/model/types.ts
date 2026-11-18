@@ -14,10 +14,15 @@ export interface DraftCell {
 
 export type KeyboardStates = Record<string, LetterState>
 
-export type GameMode = "daily" | "practice"
+export type GameMode = "daily" | "practice" | "challenge"
 
 export interface SavedDailyGame {
   day: number
+  guesses: string[]
+}
+
+export interface SavedChallengeGame {
+  word: string
   guesses: string[]
 }
 

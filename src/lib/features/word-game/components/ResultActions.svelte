@@ -6,11 +6,13 @@
     onStats,
     onDaily,
     onPractice,
+    onChallenge,
   }: {
     mode: GameMode
     onStats: () => void
     onDaily: () => void
     onPractice: () => void
+    onChallenge: () => void
   } = $props()
 </script>
 
@@ -19,6 +21,11 @@
     <button class="secondary" onclick={onStats}>Статистика</button>
     <button class="primary" onclick={onPractice}
       >Тренуватися <span>→</span></button
+    >
+  {:else if mode === "challenge"}
+    <button class="secondary" onclick={onDaily}>До слова дня</button>
+    <button class="primary" onclick={onChallenge}
+      >Кинути свій <span>→</span></button
     >
   {:else}
     <button class="secondary" onclick={onDaily}>До слова дня</button>

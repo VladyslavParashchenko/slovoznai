@@ -297,3 +297,51 @@ describe("тренування", () => {
     expect(game.target).toBe(practiceWord)
   })
 })
+
+describe("челендж", () => {
+  it("грає загадане слово і не чіпає статистику та слово дня", () => {
+    game.startChallenge("мірка")
+    expect(game.mode).toBe("challenge")
+    expect(game.target).toBe("мірка")
+
+    guess("марка")
+    guess("мірка")
+    expect(game.won).toBe(true)
+    expect(game.stats.played).toBe(0)
+    expect(onDailyFinish).not.toHaveBeenCalled()
+
+    createGame()
+    expect(game.target).toBe(TARGET)
+    expect(game.guesses).toEqual([])
+  })
+
+  it("прогрес переживає перезавантаження, але не переноситься на інше слово", () => {
+    game.startChallenge("мірка")
+    guess("марка")
+
+    createGame()
+    game.startChallenge("мірка")
+    expect(game.guesses).toEqual(["марка"])
+
+    game.startChallenge("корал")
+    expect(game.guesses).toEqual([])
+  })
+
+  it("завершений челендж відкривається з результатом, а не заново", () => {
+    game.startChallenge("мірка")
+    guess("мірка")
+
+    createGame()
+    game.startChallenge("мірка")
+    expect(game.isFinished).toBe(true)
+    expect(game.message).not.toBe("")
+  })
+
+  it("не переходить на новий день посеред челенджу", () => {
+    game.startChallenge("мірка")
+    vi.setSystemTime(new Date(2026, 9, 31, 0, 1))
+    game.checkNewDay()
+
+    expect(game.target).toBe("мірка")
+  })
+})

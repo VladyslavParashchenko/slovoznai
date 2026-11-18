@@ -2,14 +2,20 @@
   import logoWordmark from "$lib/assets/logo-wordmark.webp"
   import IconButton from "$lib/components/IconButton.svelte"
   import ThemeToggle from "$lib/components/ThemeToggle.svelte"
+  import ChallengeIcon from "$lib/components/icons/ChallengeIcon.svelte"
   import StatsIcon from "$lib/components/icons/StatsIcon.svelte"
 
   let {
     onLogoClick,
     onHelp,
     onStats,
-  }: { onLogoClick: () => void; onHelp: () => void; onStats: () => void } =
-    $props()
+    onChallenge,
+  }: {
+    onLogoClick: () => void
+    onHelp: () => void
+    onStats: () => void
+    onChallenge: () => void
+  } = $props()
 </script>
 
 <header>
@@ -18,6 +24,9 @@
   >
   <div class="actions">
     <ThemeToggle />
+    <IconButton label="Кинути челендж" onclick={onChallenge}>
+      <ChallengeIcon />
+    </IconButton>
     <IconButton label="Статистика" onclick={onStats}>
       <StatsIcon />
     </IconButton>
@@ -28,11 +37,13 @@
 <style>
   header {
     display: flex;
+    gap: 0.5rem;
     align-items: center;
     justify-content: space-between;
   }
   .brand {
     display: inline-flex;
+    min-width: 0;
     align-items: center;
     margin-left: -0.2rem;
     padding: 0;
@@ -47,6 +58,9 @@
     display: block;
     width: auto;
     height: clamp(2.2rem, 7dvh, var(--logo-max, 3.25rem));
+    max-width: 100%;
+    object-fit: contain;
+    object-position: left;
   }
   .actions {
     display: flex;
@@ -56,10 +70,16 @@
     .brand img {
       --logo-max: 2.75rem;
     }
+    .actions {
+      gap: 0.4rem;
+    }
   }
   @media (max-width: 360px) {
     .brand img {
-      --logo-max: 2.3rem;
+      --logo-max: 2.2rem;
+    }
+    .actions {
+      gap: 0.3rem;
     }
   }
 </style>

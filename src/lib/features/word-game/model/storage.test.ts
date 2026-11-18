@@ -1,6 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { createEmptyStats, recordResult } from "./stats"
-import { loadDailyGame, loadStats, saveDailyGame, saveStats } from "./storage"
+import {
+  loadChallengeGame,
+  loadDailyGame,
+  loadStats,
+  saveChallengeGame,
+  saveDailyGame,
+  saveStats,
+} from "./storage"
 
 beforeEach(() => {
   localStorage.clear()
@@ -79,4 +86,21 @@ it("гра не падає, якщо сховище недоступне", () =>
   })
 
   expect(() => saveStats(createEmptyStats(6))).not.toThrow()
+})
+
+describe("челендж", () => {
+  it("відновлює спроби лише того самого слова", () => {
+    saveChallengeGame({ word: "мірка", guesses: ["марка"] })
+
+    expect(loadChallengeGame("мірка")).toEqual({
+      word: "мірка",
+      guesses: ["марка"],
+    })
+    expect(loadChallengeGame("марка")).toBeNull()
+  })
+
+  it("ігнорує зіпсовані дані", () => {
+    localStorage.setItem("slovoznai:challenge:v1", "{not json")
+    expect(loadChallengeGame("мірка")).toBeNull()
+  })
 })
